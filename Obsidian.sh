@@ -45,7 +45,69 @@ IFS=$'\n' read -r -d '' -a result_array3 <<< "$result3"
 
 
 
-# get the older files as syncfolder
+# This block is to create backup versions
+
+# Iterate over each file in result_array1
+for file in "${result_array1[@]}"; do
+    # Iterate over each file in result_array1
+    if [ -f "$PC_FOLDER/$file" ]; then
+        
+        # Calculate checksums for both files
+        checksum_1=$(md5sum "$PC_FOLDER/$file" | cut -d ' ' -f1)
+        checksum_2=$(md5sum "$SYNC_FOLDER/$file" | cut -d ' ' -f1)
+
+        # Compare checksums to see if files are different
+        if [ "$checksum_1" != "$checksum_2" ]; then
+            # Extract directory path of file2
+            dir_path="${file%/*}"
+            # Create directory path if it doesn't exist
+            mkdir -p "/home/tom/apps/Obsidian/Sync/Backup/$dir_path"
+            # Get the current date in the format YYYY-MM-DD
+            current_date=$(date +"%Y-%m-%d-%H-%M-%S")
+            # Get the filename without the directory path
+            filename=$(basename "$file")     
+            # Separate filename and extension
+			filename_no_ext="${filename%.*}"
+			file_extension="${filename##*.}"
+			# Construct the new filename with date appended
+			new_filename="${filename_no_ext} (${current_date}).${file_extension}"
+            # Copy file to backup directory with the new filename
+            cp "$SYNC_FOLDER/$file" "/home/tom/apps/Obsidian/Sync/Backup/$dir_path/$new_filename"
+			echo "$file backuped"
+        fi
+    fi
+done
+
+# Iterate over each file in result_array1
+for file in "${result_array1[@]}"; do
+    # Iterate over each file in result_array1
+    if [ -f "$PHONE_FOLDER/$file" ]; then
+        
+        # Calculate checksums for both files
+        checksum_1=$(md5sum "$PHONE_FOLDER/$file" | cut -d ' ' -f1)
+        checksum_2=$(md5sum "$SYNC_FOLDER/$file" | cut -d ' ' -f1)
+
+        # Compare checksums to see if files are different
+        if [ "$checksum_1" != "$checksum_2" ]; then
+            # Extract directory path of file2
+            dir_path="${file%/*}"
+            # Create directory path if it doesn't exist
+            mkdir -p "/home/tom/apps/Obsidian/Sync/Backup/$dir_path"
+            # Get the current date in the format YYYY-MM-DD
+            current_date=$(date +"%Y-%m-%d-%H-%M-%S")
+            # Get the filename without the directory path
+            filename=$(basename "$file")
+            # Separate filename and extension
+			filename_no_ext="${filename%.*}"
+			file_extension="${filename##*.}"
+			# Construct the new filename with date appended
+			new_filename="${filename_no_ext} (${current_date}).${file_extension}"
+            # Copy file to backup directory with the new filename
+            cp "$SYNC_FOLDER/$file" "/home/tom/apps/Obsidian/Sync/Backup/$dir_path/$new_filename"
+			echo "$file backuped"
+        fi
+    fi
+done
 
 
 #step 1 : remove deleted files from phone
